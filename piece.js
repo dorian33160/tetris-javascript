@@ -11,17 +11,14 @@ class Piece {
     this.rows = this.shape.length;
     this.blocks = [];
     for (let i = 0; i < this.rows; i++) {
-      console.log("BOUCLE OU PAS");
         for (let j = 0; j < this.cols; j++) {
             // Si la case est pleine
             if (this.shape[i][j] !== 0) {
-              console.log("test");
                 // On ajoute a un tableau block
                 this.blocks.push({col: this.position.x + j, row: this.position.y + i});
             }
         }
     }
-    console.log(this.blocks);
 }
 
   // Retourne la forme de la pièce en fonction de son type et de sa rotation
@@ -35,13 +32,13 @@ class Piece {
       T: [[0, 1, 0], [1, 1, 1], [0, 0, 0]],
       Z: [[1, 1, 0], [0, 1, 1], [0, 0, 0]],
     };
-    return shapes[this.type][this.rotation];
+    return shapes[this.type];
   }
 
   insertPiece() {
     this.blocks.forEach(block => {
     grid[block.row][block.col] = 1;
-    });
+    })
     console.log(grid);
   }
   // Fait tourner la pièce

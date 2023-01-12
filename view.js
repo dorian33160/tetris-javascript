@@ -86,4 +86,12 @@ getEmptyGrid() {
 
 }
 
+export function refreshGrid() {
+  TetrisView.getEmptyGrid();
+  this.game.piece.blocks.forEach(block => {
+    grid[block.row][block.col] = 1;
+  })
+  console.log(grid);
+}
+
 export default TetrisView
