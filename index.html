@@ -1,0 +1,38 @@
+<html>
+    <head>
+
+    </head>
+
+    <body>
+        <div class="tetris">
+            <div class="grid"></div>
+            <div class="sidebar">
+              <div class="score-container">
+                <div class="label">Score</div>
+                <div class="score"></div>
+              </div>
+              <div class="level-container">
+                <div class="label">Level</div>
+                <div class="level"></div>
+              </div>
+              <div class="lines-container">
+                <div class="label">Lines</div>
+                <div class="lines"></div>
+              </div>
+              <div class="next-piece-container">
+                <div class="label">Next piece</div>
+                <div class="next-piece"></div>
+              </div>
+              <div class="controls">
+                <button id ="start" class="start">Start</button>
+                <button id ="stop" class="pause">Pause</button>
+              </div>
+              <div class="game-over">Game Over</div>
+            </div>
+        </div>
+        <canvas id="tetris-canvas" width="350" height="640"></canvas>
+        <script type="module" src="main.js"></script>
+        <script type="module" src="view.js"></script> 
+        <script type="module" src="modele.js"></script>
+    </body>
+</html>
