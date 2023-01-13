@@ -1,5 +1,5 @@
 import Piece from "./piece.js";
-import TetrisView, {refreshGrid} from './view.js';
+import TetrisView from './view.js';
 
 class TetrisModel {
 

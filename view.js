@@ -47,7 +47,6 @@ getEmptyGrid() {
 
     ctx.fillStyle = ctx.background;
     ctx.fillRect(0, 0, 350, 640);
-
     for (let i = 0; i < 20; i++) {
       grid[i] = new Array(10).fill(0);
     }
@@ -74,6 +73,14 @@ getEmptyGrid() {
     return grid;
   }
 
+  refreshGrid() {
+    TetrisView.getEmptyGrid();
+    this.game.piece.blocks.forEach(block => {
+      grid[block.row][block.col] = 1;
+    })
+    console.log(grid);
+  }
+
   start() {
     let piece = this.game.getRandomPiece(grid);
   }
@@ -84,14 +91,6 @@ getEmptyGrid() {
     this.intervalId = undefined;
   }
 
-}
-
-export function refreshGrid() {
-  TetrisView.getEmptyGrid();
-  this.game.piece.blocks.forEach(block => {
-    grid[block.row][block.col] = 1;
-  })
-  console.log(grid);
 }
 
 export default TetrisView
