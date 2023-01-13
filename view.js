@@ -53,16 +53,16 @@ class TetrisView {
 
     for (let x = 0; x < 11; x++) {
         ctx.beginPath();
-        ctx.moveTo(x * 20, 0);
-        ctx.lineTo(x * 20, 20 * 20);
+        ctx.moveTo(x * 37, 0);
+        ctx.lineTo(x * 37, 37 * 37);
         ctx.stroke();
     }
 
     // Dessine les lignes horizontales de la grille
     for (let y = 0; y < 21; y++) {
         ctx.beginPath();
-        ctx.moveTo(0, y * 20);
-        ctx.lineTo(10 * 20, y * 20);
+        ctx.moveTo(0, y * 37);
+        ctx.lineTo(10 * 37, y * 37);
         ctx.stroke();
     }
     //this.cols = grid[0].length;
