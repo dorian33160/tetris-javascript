@@ -6,36 +6,22 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta http-equiv="X-UA-Compatible" content="ie=edge">
       <title>Tetris 🕹️</title>
-        <!--Import font -->
       <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
       <link rel="stylesheet" href="style.css">
     </head>
 
     <body>
+      <h2>Tetris </h2>
+      <h4>Play the game</h4>
         <div class="tetris">
             <div class="grid"></div>
             <div class="sidebar">
-              <div class="score-container">
-                <div class="label">Score</div>
-                <div class="score"></div>
-              </div>
-              <div class="level-container">
-                <div class="label">Level</div>
-                <div class="level"></div>
-              </div>
-              <div class="lines-container">
-                <div class="label">Lines</div>
-                <div class="lines"></div>
-              </div>
-              <div class="next-piece-container">
-                <div class="label">Next piece</div>
-                <div class="next-piece"></div>
-              </div>
+              <h3>Score:<span id="score">0</span></h3>
+              <!-- BOUTON start et Pause -->
               <div class="controls">
                 <button id ="start" class="start">Start</button>
-                <button id ="stop" class="pause">Pause</button>
+                <button id ="stop" class="stop">Pause</button>
               </div>
-              <div class="game-over">Game Over</div>
             </div>
         </div>
         <canvas id="tetris-canvas" width="350" height="640"></canvas>

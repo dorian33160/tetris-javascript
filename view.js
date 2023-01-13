@@ -7,7 +7,6 @@ class TetrisView {
 
     constructor(game) {
     this.game = game 
-
     this.startButton = document.getElementById("start");
     this.pauseButton = document.getElementById("stop");
     this.canvas = document.getElementById('tetris-canvas');
@@ -39,7 +38,7 @@ class TetrisView {
   }
 
     // Génère une grille vide
-getEmptyGrid() {
+  getEmptyGrid() {
 
     ctx.strokeStyle = 'black';
     ctx.lineWidth = 0.5;
@@ -94,5 +93,3 @@ getEmptyGrid() {
 }
 
 export default TetrisView
-
-caca

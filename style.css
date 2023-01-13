@@ -1,6 +1,37 @@
 body {
     background-image: url("https://cdn.futura-sciences.com/buildsv6/images/largeoriginal/9/d/b/9dbcf317d5_50175715_tetris-record.jpg");
-    padding-top: 1em;                     /* autre image backgoud https://i.ibb.co/YTN069M/tetris.jpg */
+    padding-top: 1em;
     text-align: center;
     background-size: cover;
   }
+
+h2,h3 {
+  font-family: "Press Start 2P", monospace;
+  color: red;
+}
+
+h4 {
+  font-family: "Press Start 2P", monospace;
+  color: purple;
+}
+
+#start {
+  background-color: blue;
+  color: white;
+  padding: 0.5em;
+  margin: 0px 0px 25px 0px;
+  font-family: "Press Start 2P", monospace;
+}
+
+#stop {
+  background-color: red;
+  color: white;
+  padding: 0.5em;
+  margin: 0px 0px 25px 0px;
+  font-family: "Press Start 2P", monospace;
+}
+
+#score{
+  font-family: "Press Start 2P", monospace;
+  color: white;
+}
