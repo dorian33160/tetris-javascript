@@ -16,7 +16,7 @@ class Model {
         this.DisplayGrid(this.grid);
       }
     }
-    
+
     class View {
       constructor(div_id) {
         this.div_id = div_id;
@@ -41,7 +41,7 @@ class Model {
         div.appendChild(this.p_tag);
         div.appendChild(button);
       }
-    
+
       displayGrid (cnf_value) {
         if (this.p_tag) {
           this.p_tag.innerHTML = cnf_value;

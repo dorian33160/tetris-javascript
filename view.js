@@ -7,6 +7,7 @@ class TetrisView {
 
     constructor(game) {
     this.game = game 
+    
 
     this.startButton = document.getElementById("start");
     this.pauseButton = document.getElementById("stop");
@@ -38,6 +39,12 @@ class TetrisView {
     this.game = new TetrisModel(this);
   }
 
+  // Binding.
+  bindGetCNF (callback) {
+    this.getCNF = callback; // On veut pouvoir demander au Model (depuis le Controller) une nouvelle Chuck Norris Fact.
+  }
+
+  
     // Génère une grille vide
      getEmptyGrid() {
 

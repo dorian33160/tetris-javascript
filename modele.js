@@ -12,6 +12,13 @@ class TetrisModel {
     this.gameOver = false;
   }
 
+  // Binding.
+  bindDisplayGrid (callback) {
+    // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
+    this.DisplayGrid = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
+  }
+  
+
   start() {
     this.view = new TetrisView(this.game);
     this.view.getEmptyGrid();
