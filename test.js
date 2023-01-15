@@ -61,7 +61,7 @@ class TetrisView {
     bindgetRandomPiece (callback) {
         // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
         this.getRandomPiece = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
-      }
+    }
 
     binddrop (callback) {
     // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
@@ -84,6 +84,7 @@ class TetrisView {
         let columnWidth = 350/10;
         let rowHeight = 640/20; 
 
+        // Dessine les lignes verticales de la grille
         for (let x = 0; x < 11; x++) {
             ctx.beginPath();
             ctx.moveTo(x * columnWidth, 0);
@@ -98,19 +99,9 @@ class TetrisView {
             ctx.lineTo(10 * columnWidth, y * rowHeight);
             ctx.stroke();
         }
-        //this.cols = grid[0].length;
-        //this.rows = grid.length;
-        //console.log(this.cols);
-        //console.log(this.rows);
-        //console.log(grid);
+
         return grid;
     }
-
-    //Ecrit une fonction qui arrete la pièce si elle atteint une autre pièce
-    //Ecrit une fonction qui supprime une ligne si elle est remplie
-    //Ecrit une fonction qui fait descendre les pièces au dessus de la ligne supprimée
-    
-
 
     start() {
         this.getRandomPiece(grid);
@@ -136,13 +127,14 @@ class TetrisModel {
         this.lines = 0;
         this.gameOver = false;
     }
-
+    
     // Binding.
     bindgetEmptyGrid (callback) {
         // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
         this.getEmptyGrid = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
       }
 
+    //Focntion qui se lance au démarrage du jeu
     start() {
         this.getEmptyGrid();
     }
@@ -264,35 +256,23 @@ class Piece {
         this.shape = this.getShape();
     }
 
-    // Déplace la pièce vers la gauche
-    moveLeft() {
-        this.position.x--;
+    //Ecrit une fonction qui stop la pièce si elle detecte une collision en utilisant la fonction checkCollision
+    stopPiece() {
+        if (this.checkCollision()) {
+            this.position.y--;
+            this.insertPiece();
+            return true;
+        }
+        return false;
     }
 
-    // Déplace la pièce vers la droite
-    moveRight() {
-        this.position.x++;
-    }
-
-    // Déplace la pièce vers le bas
-    moveDown() {
-        this.position.y++;
-    }
-
-    // Vérifie si la pièce va entrer en collision avec les bords de la grille ou une autre pièce
     checkCollision() {
-        for (let y = 0; y < this.shape.length; y++) {
-            for (let x = 0; x < this.shape[y].length; x++) {
-                if (this.shape[y][x] === 0) {
-                    continue;
-                }
-                if (
-                    this.position.x + x < 0 ||
-                    this.position.x + x > 9 ||
-                    this.position.y + y > 19 ||
-                    this.grid[this.position.y + y][this.position.x + x] !== 0
-                ) {
-                    return true;
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                if (this.shape[i][j] !== 0) {
+                    if (this.position.y + i >= 20 || this.position.x + j < 0 || this.position.x + j >= 10 || grid[this.position.y + i][this.position.x + j] !== 0) {
+                        return true;
+                    }
                 }
             }
         }
