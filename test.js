@@ -22,9 +22,6 @@ class Controller {
         this.bindupdateGrid = this.bindupdateGrid.bind(this);
         this.modele.bindupdateGrid(this.bindupdateGrid);
 
-        this.bindifCollisionStop = this.bindifCollisionStop.bind(this);
-        this.view.bindifCollisionStop(this.bindifCollisionStop);
-
     }
 
     bindgetEmptyGrid(grid) {
@@ -43,9 +40,7 @@ class Controller {
         this.view.updateGrid();
     }
 
-    bindifCollisionStop(grid) {
-        this.modele.ifCollisonStop(grid);
-    }
+    
 }
 
 export let ctx;
@@ -82,11 +77,6 @@ class TetrisView {
     this.drop = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
     }
 
-    bindifCollisionStop (callback) {
-        // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
-        this.ifCollisonStop = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
-    }
-
     updateGrid() {
         // On efface la grille
         ctx.fillStyle = ctx.background;
@@ -115,7 +105,35 @@ class TetrisView {
         for (let i = 0; i < 20; i++) {
             for (let j = 0; j < 10; j++) {
                 if (grid[i][j] !== 0) {
-                    ctx.fillStyle = 'blue';
+                    switch (grid[i][j]) {
+                        case 1:
+                                ctx.fillStyle = 'blue';
+                        break;
+
+                        case 2:
+                                ctx.fillStyle = 'green';
+                        break;
+
+                        case 3:
+                        
+                                ctx.fillStyle = 'red';
+                        break;
+
+                        case 4:
+                         
+                                ctx.fillStyle = 'purple';
+                        break;
+
+                        case 5:
+                                ctx.fillStyle = 'grey';
+                        break;
+                        case 6:
+                                ctx.fillStyle = 'yellow';
+                        break;
+                        case 7:
+                                ctx.fillStyle = 'pink';
+                          break;
+                      }
                     ctx.fillRect(j * 35, i * 32, 35, 32);
                 }
             }
@@ -161,6 +179,7 @@ class TetrisView {
     start() {
         this.getRandomPiece(grid);
         console.log(grid);
+        this.drop();
     }
 
     //Pause the game
@@ -180,8 +199,6 @@ class TetrisModel {
         this.level = 1;
         this.lines = 0;
         this.gameOver = false;
-        this.currentPiece;
-        this.nextPiece;
     }
     
     // Binding.
@@ -198,92 +215,16 @@ class TetrisModel {
     //Focntion qui se lance au démarrage du jeu
     start() {
         this.getEmptyGrid();
+
     }
 
-    //Fonction qui arrete la piece si checkCollision renvoie true
-    ifCollisonStop() {
-        if (this.checkCollision(this.currentPiece)) {
-            this.currentPiece.y--;
-            this.currentPiece.insertPiece();
-            this.currentPiece = this.nextPiece;
-            this.nextPiece = new Piece(pieces[Math.floor(Math.random() * pieces.length)], grid);
-            this.updateGrid();
-            this.checkLines();
-            if (this.checkCollision(this.currentPiece)) {
-                this.gameOver = true;
-                this.pause();
-            }
-        } else {
-            this.currentPiece.y++;
-        }
-        this.updateGrid();
-    }
-
-    //Fonction qui vérifie si une ligne est remplie
-    checkLines() {
-        for (let i = 0; i < 20; i++) {
-            let line = true;
-            for (let j = 0; j < 10; j++) {
-                if (grid[i][j] === 0) {
-                    line = false;
-                }
-            }
-            if (line) {
-                this.lines++;
-                this.score += 100;
-                this.level = Math.floor(this.lines / 10) + 1;
-                for (let k = i; k > 0; k--) {
-                    for (let j = 0; j < 10; j++) {
-                        grid[k][j] = grid[k - 1][j];
-                    }
-                }
-                for (let j = 0; j < 10; j++) {
-                    grid[0][j] = 0;
-                }
-            }
-        }
-    }
-
-    //Ecrit la fonction gameover
-    gameOver() {
-        if (this.gameOver) {
-            alert('Game Over');
-        }
-    }
-
-    //Fonction qui regarde si la pièce ne sort pas de la grille et si elle ne touche pas une autre pièce
-    checkCollision(piece) {
-        for (let i = 0; i < piece.length; i++) {
-            for (let j = 0; j < piece[i].length; j++) {
-                if (piece[i][j] !== 0) {
-                    if (i + piece.y >= 20 || j + piece.x < 0 || j + piece.x >= 10 || grid[i + piece.y][j + piece.x] !== 0) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    //ecrit la fonction getrandompiece pour qu'elle ajoute une couleuer à la piece
-    getRandomPiece(grid) {
-        const pieces = ['I', 'J', 'L', 'O', 'S', 'T', 'Z'];
-        this.currentPiece = new Piece(pieces[Math.floor(Math.random() * pieces.length)], grid);
-        this.nextPiece = new Piece(pieces[Math.floor(Math.random() * pieces.length)], grid);
-        this.currentPiece.insertPiece();
-        this.updateGrid();
-        this.drop();
-    }
-
-//EN ATTENDANT DE TEST LA NVELLE FONCTION
-/*
     getRandomPiece(grid) {
         const pieces = ['I', 'J', 'L', 'O', 'S', 'T', 'Z'];
         const new_piece = new Piece(pieces[Math.floor(Math.random() * pieces.length)], grid);
         new_piece.insertPiece();
         this.updateGrid();
     }
-*/
+
     moveDown() {
         for (let i = 19; i >= 0; i--) {
             for (let j = 0; j < 10; j++) {
@@ -301,10 +242,10 @@ class TetrisModel {
     }
 
     drop() {
+        const pieces = ['I', 'J', 'L', 'O', 'S', 'T', 'Z'];
+        const new_piece = new Piece(pieces[Math.floor(Math.random() * pieces.length)], grid);
         this.intervalId = setInterval(() => {
             this.moveDown();
-            this.checkCollision(this.currentPiece);
-            console.log(grid);
         }, 1000);
     }
 
