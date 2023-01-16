@@ -115,9 +115,6 @@ class TetrisView {
         for (let i = 0; i < 20; i++) {
             for (let j = 0; j < 10; j++) {
                 if (grid[i][j] !== 0) {
-<<<<<<< Updated upstream
-                    ctx.fillStyle = 'blue';
-=======
                     switch (grid[i][j]) {
                         case 1:
                                 ctx.fillStyle = 'blue';
@@ -147,7 +144,6 @@ class TetrisView {
                                 ctx.fillStyle = 'pink';
                           break;
                       }
->>>>>>> Stashed changes
                     ctx.fillRect(j * 35, i * 32, 35, 32);
                 }
             }
@@ -357,7 +353,7 @@ class Piece {
                 // Si la case est pleine
                 if (this.shape[i][j] !== 0) {
                     // On ajoute a un tableau block
-                    this.blocks.push({ col: this.position.x + j, row: this.position.y + i });
+                    this.blocks.push({ col: this.position.x + j, row: this.position.y + i, color: this.shape[i][j] });
                 }
             }
         }
@@ -367,19 +363,19 @@ class Piece {
     getShape() {
         const shapes = {
             I: [[0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0]],
-            J: [[1, 0, 0], [1, 1, 1], [0, 0, 0]],
-            L: [[0, 0, 1], [1, 1, 1], [0, 0, 0]],
-            O: [[1, 1], [1, 1]],
-            S: [[0, 1, 1], [1, 1, 0], [0, 0, 0]],
-            T: [[0, 1, 0], [1, 1, 1], [0, 0, 0]],
-            Z: [[1, 1, 0], [0, 1, 1], [0, 0, 0]],
+            J: [[2, 0, 0], [2, 2, 2], [0, 0, 0]],
+            L: [[0, 0, 3], [3, 3, 3], [0, 0, 0]],
+            O: [[4, 4], [4, 4]],
+            S: [[0, 5, 5], [5, 5, 0], [0, 0, 0]],
+            T: [[0, 6, 0], [6, 6, 6], [0, 0, 0]],
+            Z: [[7, 7, 0], [0, 7, 7], [0, 0, 0]],
         };
         return shapes[this.type];
     }
 
     insertPiece() {
         this.blocks.forEach(block => {
-            grid[block.row][block.col] = 1;
+            grid[block.row][block.col] = block.color;
         })
     }
     // Fait tourner la pièce
