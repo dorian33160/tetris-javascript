@@ -19,6 +19,9 @@ class Controller {
         this.binddrop = this.binddrop.bind(this);
         this.view.binddrop(this.binddrop);
 
+        this.bindupdateGrid = this.bindupdateGrid.bind(this);
+        this.modele.bindupdateGrid(this.bindupdateGrid);
+
     }
 
     bindgetEmptyGrid(grid) {
@@ -31,6 +34,10 @@ class Controller {
 
     binddrop() {
         this.modele.drop();
+    }
+
+    bindupdateGrid() {
+        this.view.updateGrid();
     }
 }
 
@@ -66,6 +73,41 @@ class TetrisView {
     binddrop (callback) {
     // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
     this.drop = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
+    }
+
+    updateGrid() {
+        // On efface la grille
+        ctx.fillStyle = ctx.background;
+        ctx.fillRect(0, 0, 350, 640);
+        // On dessine les lignes
+
+        let columnWidth = 350/10;
+        let rowHeight = 640/20;
+
+        for (let x = 0; x < 11; x++) {
+            ctx.beginPath();
+            ctx.moveTo(x * columnWidth, 0);
+            ctx.lineTo(x * columnWidth, 20 * rowHeight);
+            ctx.stroke();
+        }
+
+        // Dessine les lignes horizontales de la grille
+        for (let y = 0; y < 21; y++) {
+            ctx.beginPath();
+            ctx.moveTo(0, y * rowHeight);
+            ctx.lineTo(10 * columnWidth, y * rowHeight);
+            ctx.stroke();
+        }
+        
+        // On dessine les blocs
+        for (let i = 0; i < 20; i++) {
+            for (let j = 0; j < 10; j++) {
+                if (grid[i][j] !== 0) {
+                    ctx.fillStyle = grid[i][j];
+                    ctx.fillRect(j * 35, i * 32, 35, 32);
+                }
+            }
+        }
     }
 
     // Génère une grille vide
@@ -132,11 +174,17 @@ class TetrisModel {
     bindgetEmptyGrid (callback) {
         // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
         this.getEmptyGrid = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
-      }
+    }
+
+    bindupdateGrid (callback) {
+        // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
+        this.updateGrid = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
+    }
 
     //Focntion qui se lance au démarrage du jeu
     start() {
         this.getEmptyGrid();
+
     }
 
     getRandomPiece(grid) {
@@ -144,41 +192,6 @@ class TetrisModel {
         const new_piece = new Piece(pieces[Math.floor(Math.random() * pieces.length)], grid);
         new_piece.insertPiece();
         this.updateGrid();
-    }
-
-    updateGrid() {
-        // On efface la grille
-        ctx.fillStyle = ctx.background;
-        ctx.fillRect(0, 0, 350, 640);
-        // On dessine les lignes
-
-        let columnWidth = 350/10;
-        let rowHeight = 640/20;
-
-        for (let x = 0; x < 11; x++) {
-            ctx.beginPath();
-            ctx.moveTo(x * columnWidth, 0);
-            ctx.lineTo(x * columnWidth, 20 * rowHeight);
-            ctx.stroke();
-        }
-
-        // Dessine les lignes horizontales de la grille
-        for (let y = 0; y < 21; y++) {
-            ctx.beginPath();
-            ctx.moveTo(0, y * rowHeight);
-            ctx.lineTo(10 * columnWidth, y * rowHeight);
-            ctx.stroke();
-        }
-        
-        // On dessine les blocs
-        for (let i = 0; i < 20; i++) {
-            for (let j = 0; j < 10; j++) {
-                if (grid[i][j] !== 0) {
-                    ctx.fillStyle = grid[i][j];
-                    ctx.fillRect(j * 35, i * 32, 35, 32);
-                }
-            }
-        }
     }
 
     moveDown() {
@@ -198,6 +211,8 @@ class TetrisModel {
     }
 
     drop() {
+        const pieces = ['I', 'J', 'L', 'O', 'S', 'T', 'Z'];
+        const new_piece = new Piece(pieces[Math.floor(Math.random() * pieces.length)], grid);
         this.intervalId = setInterval(() => {
             this.moveDown();
         }, 1000);
@@ -254,29 +269,6 @@ class Piece {
             this.rotation = (this.rotation + 3) % 4;
         }
         this.shape = this.getShape();
-    }
-
-    //Ecrit une fonction qui stop la pièce si elle detecte une collision en utilisant la fonction checkCollision
-    stopPiece() {
-        if (this.checkCollision()) {
-            this.position.y--;
-            this.insertPiece();
-            return true;
-        }
-        return false;
-    }
-
-    checkCollision() {
-        for (let i = 0; i < this.rows; i++) {
-            for (let j = 0; j < this.cols; j++) {
-                if (this.shape[i][j] !== 0) {
-                    if (this.position.y + i >= 20 || this.position.x + j < 0 || this.position.x + j >= 10 || grid[this.position.y + i][this.position.x + j] !== 0) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
     }
 
     placePiece() {
