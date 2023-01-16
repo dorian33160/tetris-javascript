@@ -115,7 +115,39 @@ class TetrisView {
         for (let i = 0; i < 20; i++) {
             for (let j = 0; j < 10; j++) {
                 if (grid[i][j] !== 0) {
+<<<<<<< Updated upstream
                     ctx.fillStyle = 'blue';
+=======
+                    switch (grid[i][j]) {
+                        case 1:
+                                ctx.fillStyle = 'blue';
+                        break;
+
+                        case 2:
+                                ctx.fillStyle = 'green';
+                        break;
+
+                        case 3:
+                                ctx.fillStyle = 'red';
+                        break;
+
+                        case 4:
+                                ctx.fillStyle = 'purple';
+                        break;
+
+                        case 5:
+                                ctx.fillStyle = 'grey';
+                        break;
+                        
+                        case 6:
+                                ctx.fillStyle = 'yellow';
+                        break;
+                        
+                        case 7:
+                                ctx.fillStyle = 'pink';
+                          break;
+                      }
+>>>>>>> Stashed changes
                     ctx.fillRect(j * 35, i * 32, 35, 32);
                 }
             }
