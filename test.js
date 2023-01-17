@@ -245,9 +245,7 @@ class TetrisModel {
         for (let i = 19; i >= 0; i--) {
             for (let j = 0; j < 10; j++) {
                 if (grid[i][j] !== 0) {
-                    if (i === 19) {
-                        grid[i][j] = grid[i][j];
-                    } else {
+                    if (i !== 19 && grid[i + 1][j] === 0) {
                         grid[i + 1][j] = grid[i][j];
                         grid[i][j] = 0;
                     }
