@@ -120,36 +120,26 @@ class TetrisView {
         for (let i = 0; i < 20; i++) {
             for (let j = 0; j < 10; j++) {
                 if (grid[i][j] !== 0) {
-                    switch (grid[i][j]) {
-                        case 1:
-                                ctx.fillStyle = 'blue';
-                        break;
+                    const id = grid[i][j];
 
-                        case 2:
-                                ctx.fillStyle = 'green';
-                        break;
+                    let colorValue;
+                    let color;
+                
+                    tableauDePieces.forEach(piece => {
+                        if (piece.id === id) {
+                            piece.shape.forEach((row, y) => {
+                                row.forEach((value, x) => {
+                                    if (value !== 0) {
+                                        colorValue = value;
+                                        color = piece.getColor(colorValue);
+                                    }
+                                })
+                            })
+                        }
+                    })
 
-                        case 3:
-                                ctx.fillStyle = 'red';
-                        break;
-
-                        case 4:
-                                ctx.fillStyle = 'purple';
-                        break;
-
-                        case 5:
-                                ctx.fillStyle = 'grey';
-                        break;
-                        
-                        case 6:
-                                ctx.fillStyle = 'yellow';
-                        break;
-                        
-                        case 7:
-                                ctx.fillStyle = 'pink';
-                          break;
-                      }
-                    ctx.fillRect(j * 35, i * 32, 35, 32);
+                    ctx.fillStyle = color;
+                    ctx.fillRect(j * columnWidth, i * rowHeight, columnWidth, rowHeight);
                 }
             }
         }
@@ -233,40 +223,81 @@ class TetrisModel {
 
     //ecrit la fonction getrandompiece pour qu'elle ajoute une couleuer à la piece
     getRandomPiece(grid) {
+
+        let date = new Date();
+        let seed = date.getTime();
+
         const pieces = ['I', 'J', 'L', 'O', 'S', 'T', 'Z'];
-        this.currentPiece = new Piece(pieces[Math.floor(Math.random() * pieces.length)], grid);
-        this.nextPiece = new Piece(pieces[Math.floor(Math.random() * pieces.length)], grid);
+        this.currentPiece = new Piece(seed, pieces[Math.floor(Math.random() * pieces.length)], grid);
+        this.nextPiece = new Piece(seed, pieces[Math.floor(Math.random() * pieces.length)], grid);
         this.currentPiece.insertPiece();
         this.updateGrid();
         this.drop();
+        tableauDePieces.push(this.currentPiece);
     }
 
     moveDown() {
-        for (let i = 19; i >= 0; i--) {
-            for (let j = 0; j < 10; j++) {
-                if (grid[i][j] !== 0) {
-                    if (i !== 19 && grid[i + 1][j] === 0) {
-                        grid[i + 1][j] = grid[i][j];
-                        grid[i][j] = 0;
-                    }
+        let impossible = false;
+        let points = [];
+
+        for (let row = 0; row < grid.length; row++) {
+            for (let col = 0; col < grid[0].length; col++) {
+                if (grid[row][col] === this.currentPiece.id) {
+                    // Ajoute le point à la liste des points
+                    points.push({
+                        row: row,
+                        col: col,
+                    })
+
+                    // Supprime l'identifiant de la pièce de la grille
+                    grid[row][col] = 0;
                 }
             }
         }
-        this.updateGrid();
+
+        // On vérifie si la pièce peut être déplacée
+        points.forEach((point) => {
+            if(point.row === 19 || grid[point.row + 1][point.col] !== 0) {
+                console.log(point.row, point.col)
+                impossible = true;
+            }
+        })
+        
+        if(!impossible) {
+            points.forEach((point) => {
+                // On déplace la pièce d'une ligne vers le bas
+                grid[point.row + 1][point.col] = this.currentPiece.id;
+                this.updateGrid();
+                return 1;
+            })
+        } else {
+            points.forEach(point => {
+                grid[point.row][point.col] = this.currentPiece.id;
+            })
+            return 0;
+        }
+
+        console.log(grid);
     }
 
-    drop() {
+    drop() {    
+        clearInterval(this.intervalId);
         this.intervalId = setInterval(() => {
-            this.moveDown();
-            console.log(this.currentPiece);
-        }, 1000);
-    }
-
+            if(this.moveDown() === 0){
+                console.log('impossible');
+                this.getRandomPiece(grid);
+                this.updateGrid();
+            }   
+        }, 100);
+    }   
 }
 
-class Piece {
-    constructor(type, grid_piece) {
+export let tableauDePieces = [];
 
+class Piece {
+    constructor(id, type, grid_piece) {
+
+        this.id = id;
         this.type = type;
         grid = grid_piece;
         this.position = { x: 3, y: 0 };
@@ -300,9 +331,42 @@ class Piece {
         return shapes[this.type];
     }
 
+    getColor(id) {
+        switch (id) {
+            case 1:
+                return 'blue';
+            break;
+
+            case 2:
+                return 'green';
+            break;
+
+            case 3:
+                return 'red';
+            break;
+
+            case 4:
+                return 'purple';
+            break;
+
+            case 5:
+                return 'grey';
+            break;
+            
+            case 6:
+                return'yellow';
+            break;
+            
+            case 7:
+                return 'pink';
+            break;
+        }
+    }
+
+
     insertPiece() {
         this.blocks.forEach(block => {
-            grid[block.row][block.col] = block.color;
+            grid[block.row][block.col] = this.id;
         })
     }
     // Fait tourner la pièce
@@ -326,16 +390,6 @@ class Piece {
         }
     }
 
-    //ecrit une fonction qui arrête la pièce quand elle atteint la dernière ligne de la grille
-    stopPiece() {
-        for (let i = 0; i < this.blocks.length; i++) {
-            if (this.blocks[i].row === 19) {
-                this.blocks[i].row = this.blocks[i].row;
-            } else {
-                this.blocks[i].row += 1;
-            }
-        }
-    }
 }
 
 const app = new Controller(new TetrisModel(), new TetrisView());
