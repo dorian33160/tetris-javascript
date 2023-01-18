@@ -1,3 +1,4 @@
+/***************** CLASSE CONTROLLER  ************************/
 class Controller {
     constructor(modele, view) {
         this.modele = modele;
@@ -37,6 +38,9 @@ class Controller {
         this.bindremoveLine = this.bindremoveLine.bind(this);
         this.modele.bindremoveLine(this.bindremoveLine);
 
+        this.bindgameOver = this.bindgameOver.bind(this);
+        this.modele.bindgameOver(this.bindgameOver);
+
     }
 
     bindgetEmptyGrid(grid) {
@@ -73,6 +77,10 @@ class Controller {
 
     bindremoveLine() {
         this.view.removeLine();
+    }
+
+    bindgameOver() {
+        this.view.gameOver();
     }
 
 }
@@ -141,6 +149,16 @@ class TetrisView {
     }
 
 ///////////////////// FIN BIND VIEW  ////////////////////////////////
+
+    //Fonction qui arrete le jeu quand une piece touche le haut de la grille
+    gameOver() {
+        if (grid[0].some(function(cell) {
+            return cell !== 0;
+        })) {
+            alert("Game Over");
+            this.pause();
+        }
+    }
 
     //Fonction qui permet de supprimer la ligne lorsque elle est pleine
     removeLine() {
@@ -256,6 +274,7 @@ class TetrisView {
 
 }
 
+/***************** CLASSE MODELE  ************************/
 class TetrisModel {
 
     constructor() {
@@ -282,6 +301,11 @@ class TetrisModel {
     bindremoveLine (callback) {
         // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
         this.removeLine = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
+    }
+
+    bindgameOver (callback) {
+        // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
+        this.gameOver = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
     }
     
 ///////////////////// FIN BIND MODELE  ////////////////////////////////
@@ -487,8 +511,9 @@ class TetrisModel {
         this.intervalId = setInterval(() => {
             if(this.moveDown() === 0){
                 this.getRandomPiece(grid);
-                this.updateGrid();
                 this.removeLine();
+                this.gameOver();
+                this.updateGrid();
             }   
         }, 1000);
     }   
@@ -583,7 +608,7 @@ class Piece {
             }
         }
     }
-
+    /***************** FIN CLASSE PIECE  ************************/
 }
 
 const app = new Controller(new TetrisModel(), new TetrisView());
