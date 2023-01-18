@@ -34,6 +34,9 @@ class Controller {
         this.bindmoveDown = this.bindmoveDown.bind(this);
         this.view.bindmoveDown(this.bindmoveDown);
 
+        this.bindremoveLine = this.bindremoveLine.bind(this);
+        this.modele.bindremoveLine(this.bindremoveLine);
+
     }
 
     bindgetEmptyGrid(grid) {
@@ -68,6 +71,10 @@ class Controller {
         this.modele.moveDown();
     }
 
+    bindremoveLine() {
+        this.view.removeLine();
+    }
+
 }
 
 export let ctx;
@@ -91,52 +98,64 @@ class TetrisView {
             this.pause();
         });
 
-         //Deplacement lorsque on appuit sur fleche gauche (37), fleche du haut (38), fleche de droite (39)
+        //Detecte lorsque on appuit sur une touche du clavier
         document.addEventListener("keydown", function(event) {
-            if (event.keyCode == 37) {
+            if (event.keyCode == 37) { //fleche gauche
                 this.moveLeft();
-            } else if (event.keyCode == 39) {
+            } else if (event.keyCode == 39) { //fleche de droite
                 this.moveRight();
-            } else if (event.keyCode == 38) {
+            } else if (event.keyCode == 38) { //fleche du haut pour rotate la piece
                 this.rotate();
-            } else if (event.keyCode == 40) {
+            } else if (event.keyCode == 40) { //fleche du bas pour faire acceler la piece
                 this.moveDown();
             }
         }.bind(this));
 
         this.game = new TetrisModel(this);
-    }
+    }  
 
+///////////////////// BIND VIEW  ////////////////////////////////
     bindgetRandomPiece (callback) {
-        // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
+        // Definition d'une nouvelle propriete pouvant etre utilisee a partir d'une instance de Model.
         this.getRandomPiece = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
     }
 
     binddrop (callback) {
-    // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
-        this.drop = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
+        this.drop = callback; 
     }
 
     bindmoveRight (callback) {
-        // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
-        this.moveRight = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
+        this.moveRight = callback; 
     }
 
     bindmoveLeft (callback) {
-        // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
-        this.moveLeft = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
+        this.moveLeft = callback; 
     }
 
     bindrotate (callback) {
-        // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
-        this.rotate = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
+        this.rotate = callback; 
     }
 
     bindmoveDown (callback) {
-        // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
-        this.moveDown = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
+        this.moveDown = callback; 
     }
 
+///////////////////// FIN BIND VIEW  ////////////////////////////////
+
+    //Fonction qui permet de supprimer la ligne lorsque elle est pleine
+    removeLine() {
+        for (let row = 0; row < grid.length; row++) {
+            let isRowFull = grid[row].every(function(cell) {
+                return cell !== 0;
+            });
+            if (isRowFull) {
+                grid.splice(row, 1);
+                grid.unshift(Array(10).fill(0));
+            }
+        }
+    }
+
+    //Permet de mettre a jour la grille
     updateGrid() {
         // On efface la grille
         ctx.fillStyle = ctx.background;
@@ -190,9 +209,9 @@ class TetrisView {
         }
     }
 
-    // Génère une grille vide
+    // Genere une grille vide
     getEmptyGrid() {
-
+        //Design du canvas
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 0.5;
         ctx.background = 'white';
@@ -221,10 +240,9 @@ class TetrisView {
             ctx.lineTo(10 * columnWidth, y * rowHeight);
             ctx.stroke();
         }
-
         return grid;
     }
-
+    //start the game
     start() {
         this.getEmptyGrid();
         this.getRandomPiece(grid);
@@ -241,7 +259,6 @@ class TetrisView {
 class TetrisModel {
 
     constructor() {
-
         this.grid;
         this.score = 0;
         this.level = 1;
@@ -251,7 +268,7 @@ class TetrisModel {
         this.nextPiece;
     }
     
-    // Binding.
+///////////////////// BIND MODELE  ////////////////////////////////
     bindgetEmptyGrid (callback) {
         // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
         this.getEmptyGrid = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
@@ -261,6 +278,13 @@ class TetrisModel {
         // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
         this.updateGrid = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
     }
+
+    bindremoveLine (callback) {
+        // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
+        this.removeLine = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
+    }
+    
+///////////////////// FIN BIND MODELE  ////////////////////////////////
 
     //Focntion qui se lance au démarrage du jeu
     start() {
@@ -325,6 +349,7 @@ class TetrisModel {
         }
     }
 
+    //Fonction qui deplace la piece a droite
     moveRight() {
         let impossible = false;
         let points = [];
@@ -367,6 +392,7 @@ class TetrisModel {
         }
     }
 
+    //Fonction qui deplace la piece a gauche
     moveLeft() {
         let impossible = false;
         let points = [];
@@ -409,6 +435,7 @@ class TetrisModel {
         }
     }
 
+    //Fonction qui permet de faire rotate la piece
     rotate() {
         let impossible = false;
         let points = [];
@@ -454,19 +481,25 @@ class TetrisModel {
         this.updateGrid();
     }
 
+    
     drop() {    
         clearInterval(this.intervalId);
         this.intervalId = setInterval(() => {
             if(this.moveDown() === 0){
                 this.getRandomPiece(grid);
                 this.updateGrid();
+                this.removeLine();
             }   
         }, 1000);
     }   
 }
+/*******************  FIN CLASSE MODELE  *********************/
+
 
 export let tableauDePieces = [];
 
+
+/*******************   CLASSE PIECE  *********************/
 class Piece {
     constructor(id, type, grid_piece) {
 
@@ -503,7 +536,8 @@ class Piece {
         };
         return shapes[this.type];
     }
-
+    
+    //Fonction qui permet de mettre de la couleur sur les piece
     getColor(id) {
         switch (id) {
             case 1:
