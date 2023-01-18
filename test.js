@@ -22,6 +22,18 @@ class Controller {
         this.bindupdateGrid = this.bindupdateGrid.bind(this);
         this.modele.bindupdateGrid(this.bindupdateGrid);
 
+        this.bindmoveRight = this.bindmoveRight.bind(this);
+        this.view.bindmoveRight(this.bindmoveRight);
+
+        this.bindmoveLeft = this.bindmoveLeft.bind(this);
+        this.view.bindmoveLeft(this.bindmoveLeft);
+
+        this.bindrotate = this.bindrotate.bind(this);
+        this.view.bindrotate(this.bindrotate);
+
+        this.bindmoveDown = this.bindmoveDown.bind(this);
+        this.view.bindmoveDown(this.bindmoveDown);
+
     }
 
     bindgetEmptyGrid(grid) {
@@ -38,6 +50,22 @@ class Controller {
 
     bindupdateGrid() {
         this.view.updateGrid();
+    }
+
+    bindmoveRight() {
+        this.modele.moveRight();
+    }
+
+    bindmoveLeft() {
+        this.modele.moveLeft();
+    }
+
+    bindrotate() {
+        this.modele.rotate();
+    }
+
+    bindmoveDown() {
+        this.modele.moveDown();
     }
 
 }
@@ -63,17 +91,19 @@ class TetrisView {
             this.pause();
         });
 
-        //Deplacement lorsque on appuit sur fleche gauche (37), fleche du haut (38), fleche de droite (39)
-        /*document.addEventListener("keydown", function(event) {
+         //Deplacement lorsque on appuit sur fleche gauche (37), fleche du haut (38), fleche de droite (39)
+        document.addEventListener("keydown", function(event) {
             if (event.keyCode == 37) {
-                // Move piece left
+                this.moveLeft();
             } else if (event.keyCode == 39) {
-                // Move piece right
+                this.moveRight();
             } else if (event.keyCode == 38) {
-                // Rotate piece
+                this.rotate();
+            } else if (event.keyCode == 40) {
+                this.moveDown();
             }
-        });
-        */
+        }.bind(this));
+
         this.game = new TetrisModel(this);
     }
 
@@ -84,12 +114,27 @@ class TetrisView {
 
     binddrop (callback) {
     // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
-    this.drop = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
+        this.drop = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
     }
 
-    bindifCollisionStop (callback) {
+    bindmoveRight (callback) {
         // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
-        this.ifCollisonStop = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
+        this.moveRight = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
+    }
+
+    bindmoveLeft (callback) {
+        // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
+        this.moveLeft = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
+    }
+
+    bindrotate (callback) {
+        // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
+        this.rotate = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
+    }
+
+    bindmoveDown (callback) {
+        // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
+        this.moveDown = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
     }
 
     updateGrid() {
@@ -181,6 +226,7 @@ class TetrisView {
     }
 
     start() {
+        this.getEmptyGrid();
         this.getRandomPiece(grid);
     }
 
@@ -218,6 +264,7 @@ class TetrisModel {
 
     //Focntion qui se lance au démarrage du jeu
     start() {
+        this.getEmptyGrid();
         this.getEmptyGrid();
     }
 
@@ -258,7 +305,6 @@ class TetrisModel {
         // On vérifie si la pièce peut être déplacée
         points.forEach((point) => {
             if(point.row === 19 || grid[point.row + 1][point.col] !== 0) {
-                console.log(point.row, point.col)
                 impossible = true;
             }
         })
@@ -267,6 +313,7 @@ class TetrisModel {
             points.forEach((point) => {
                 // On déplace la pièce d'une ligne vers le bas
                 grid[point.row + 1][point.col] = this.currentPiece.id;
+                this.currentPiece.position = { row: points[0].row + 1, col: points[0].col }
                 this.updateGrid();
                 return 1;
             })
@@ -276,19 +323,145 @@ class TetrisModel {
             })
             return 0;
         }
+    }
 
-        console.log(grid);
+    moveRight() {
+        let impossible = false;
+        let points = [];
+
+        for (let row = 0; row < grid.length; row++) {
+            for (let col = 0; col < grid[0].length; col++) {
+                if (grid[row][col] === this.currentPiece.id) {
+                    // Ajoute le point à la liste des points
+                    points.push({
+                        row: row,
+                        col: col,
+                    })
+
+                    // Supprime l'identifiant de la pièce de la grille
+                    grid[row][col] = 0;
+                }
+            }
+        }
+
+        // On vérifie si la pièce peut être déplacée
+        points.forEach((point) => {
+            if(point.row === 19 || grid[point.row][point.col + 1] !== 0) {
+                impossible = true;
+            }
+        })
+
+        if(!impossible) {
+            points.forEach((point) => {
+                // On déplace la pièce d'une colonne vers la droite
+                grid[point.row][point.col + 1] = this.currentPiece.id;
+                this.currentPiece.position = { row: points[0].row, col: points[0].col + 1 }
+                this.updateGrid();
+                return 1;
+            })
+        } else {
+            points.forEach(point => {
+                grid[point.row][point.col] = this.currentPiece.id;
+            })
+            return 0;
+        }
+    }
+
+    moveLeft() {
+        let impossible = false;
+        let points = [];
+
+        for (let row = 0; row < grid.length; row++) {
+            for (let col = 0; col < grid[0].length; col++) {
+                if (grid[row][col] === this.currentPiece.id) {
+                    // Ajoute le point à la liste des points
+                    points.push({
+                        row: row,
+                        col: col,
+                    })
+
+                    // Supprime l'identifiant de la pièce de la grille
+                    grid[row][col] = 0;
+                }
+            }
+        }
+
+        // On vérifie si la pièce peut être déplacée
+        points.forEach((point) => {
+            if(point.row === 19 || grid[point.row][point.col - 1] !== 0) {
+                impossible = true;
+            }
+        })
+        
+        if(!impossible) {
+            points.forEach((point) => {
+                // On déplace la pièce d'une colonne vers la gauche
+                grid[point.row][point.col - 1] = this.currentPiece.id;
+                this.currentPiece.position = { row: points[0].row, col: points[0].col - 1 }
+                this.updateGrid();
+                return 1;
+            })
+        } else {
+            points.forEach(point => {
+                grid[point.row][point.col] = this.currentPiece.id;
+            })
+            return 0;
+        }
+    }
+
+    rotate() {
+        let impossible = false;
+        let points = [];
+
+        console.log(this.currentPiece);
+
+        for (let row = 0; row < grid.length; row++) {
+            for (let col = 0; col < grid[0].length; col++) {
+                if (grid[row][col] === this.currentPiece.id) {
+                    // Ajoute le point à la liste des points
+                    points.push({
+                        row: row,
+                        col: col,
+                    })
+
+                    // Supprime l'identifiant de la pièce de la grille
+                    grid[row][col] = 0;
+                }
+            }
+        }
+
+        let newShape = [];
+        for (let i = 0; i < this.currentPiece.shape[0].length; i++) {
+            newShape[i] = [];
+            for (let j = 0; j < this.currentPiece.shape.length; j++) {
+                newShape[i][j] = this.currentPiece.shape[this.currentPiece.shape.length - j - 1][i];
+            }
+        }
+
+        console.log(newShape);
+
+        this.currentPiece.shape = newShape;
+
+        // Via sa shape, on replace la pièce dans la grille
+        for (let i = 0; i < this.currentPiece.shape.length; i++) {
+            for (let j = 0; j < this.currentPiece.shape[0].length; j++) {
+                if (this.currentPiece.shape[i][j] !== 0) {
+                    grid[this.currentPiece.position.row + i][this.currentPiece.position.col + j] = this.currentPiece.id;
+                }
+            }
+        }
+
+        this.updateGrid();
     }
 
     drop() {    
         clearInterval(this.intervalId);
         this.intervalId = setInterval(() => {
             if(this.moveDown() === 0){
-                console.log('impossible');
                 this.getRandomPiece(grid);
                 this.updateGrid();
             }   
-        }, 100);
+        }, 1000);
     }   
 }
 
@@ -335,40 +508,27 @@ class Piece {
         switch (id) {
             case 1:
                 return 'blue';
-            break;
-
             case 2:
                 return 'green';
-            break;
-
             case 3:
                 return 'red';
-            break;
-
             case 4:
                 return 'purple';
-            break;
-
             case 5:
                 return 'grey';
-            break;
-            
             case 6:
                 return'yellow';
-            break;
-            
             case 7:
                 return 'pink';
-            break;
         }
     }
-
 
     insertPiece() {
         this.blocks.forEach(block => {
             grid[block.row][block.col] = this.id;
         })
     }
+
     // Fait tourner la pièce
     rotate(clockwise = true) {
         if (clockwise) {
