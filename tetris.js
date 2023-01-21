@@ -85,24 +85,24 @@ class Controller {
 
 }
 /***************** FIN CLASSE CONTROLLER  ************************/
-export let ctx;
-export let grid = [];
+export let ctx; //pour dessiner le canvas
+export let grid = []; //grille de jeu
 
 /***************** CLASSE VIEW  ************************/
 class TetrisView {
 
     constructor() {
-        this.score = 0; 
-        this.startButton = document.getElementById("start");
-        this.pauseButton = document.getElementById("pause");
-        this.canvas = document.getElementById('tetris-canvas');
-        ctx = this.canvas.getContext('2d');
-        this.getEmptyGrid();
+        this.score = 0; //score du joueur
+        this.startButton = document.getElementById("start"); //bouton start
+        this.pauseButton = document.getElementById("pause"); //bouton pause
+        this.canvas = document.getElementById('tetris-canvas'); //canvas
+        ctx = this.canvas.getContext('2d'); //pour dessiner le canvas
+        this.getEmptyGrid(); //initiation de la grille
 
-        this.startButton.addEventListener('click', () => {
+        this.startButton.addEventListener('click', () => { //evenement qui suit un click sur le bouton start
             this.start();
         });
-        this.pauseButton.addEventListener('click', () => {
+        this.pauseButton.addEventListener('click', () => { //Détecte lorsque on clique sur pause
             this.pause();
         });
         
@@ -119,8 +119,6 @@ class TetrisView {
                 this.moveDown();
             }
         }.bind(this));
-
-        this.game = new TetrisModel(this);
     }  
 
 ///////////////////// BIND VIEW  ////////////////////////////////
@@ -151,38 +149,41 @@ class TetrisView {
 
 ///////////////////// FIN BIND VIEW  ////////////////////////////////
 
+    //fonction qui permet d'augmenter le score
     increaseScore() {
-        this.score = this.score + 100;
-        document.getElementById("score").innerHTML = this.score;
+        this.score = this.score + 100; // On ajoute 100 a chaque fois qu'une ligne est remplis et cassee
+        document.getElementById("score").innerHTML = this.score; //Va cehrcher l'id score dans l'HTML pour afficher le score
     }
 
     //Fonction qui permet de supprimer la ligne lorsque elle est pleine et rajoute une ligne de zero en haut de la grille
     removeLine() {
+        //boucle qui parcours les lignes de la grille
         for (let row = 0; row < grid.length; row++) {
+            //Parcour chaque cellule de la ligne et verifie si elle est pleine
             let isRowFull = grid[row].every(function(cell) {
                 return cell !== 0;
             });
-            if (isRowFull) {
-                grid.splice(row, 1);
-                grid.unshift(Array(10).fill(0));
-                this.increaseScore();
+            if (isRowFull) { //Si une ligne est pleine alors :
+                grid.splice(row, 1); // On la supprime
+                grid.unshift(Array(10).fill(0)); // On en rajoute une nouvelle en haut du canvas
+                this.increaseScore(); //Appelle fonction pour augmenter le score
             }
         }
     }
 
     //Permet de mettre a jour la grille
     updateGrid() {
-        // On efface la grille
+        // On recree la grille
         ctx.fillStyle = ctx.background;
         ctx.fillRect(0, 0, 350, 640);
-        // On dessine les lignes
 
+        //permet de calculer la taille exacte des cellules
         let columnWidth = 350/10;
         let rowHeight = 640/20;
 
         // Dessine les lignes verticales de la grille
         for (let x = 0; x < 11; x++) {
-            ctx.beginPath();
+            ctx.beginPath(); //Permet de demarrer un nouveau chemin pour dessiner sur un canvas
             ctx.moveTo(x * columnWidth, 0); //deplace le curseur de dessin de haut
             ctx.lineTo(x * columnWidth, 20 * rowHeight); // en bas
             ctx.stroke(); //dessine reellement les colonnes
@@ -190,36 +191,36 @@ class TetrisView {
 
         // Dessine les lignes horizontales de la grille
         for (let y = 0; y < 21; y++) {
-            ctx.beginPath();
+            ctx.beginPath(); //Permet de demarrer un nouveau chemin pour dessiner sur un canvas
             ctx.moveTo(0, y * rowHeight); //deplace le curseur de dessin de gauche
             ctx.lineTo(10 * columnWidth, y * rowHeight); //a droite
             ctx.stroke(); //dessine reellement les lignes
         }
         
-        // On dessine les blocs
+        // On dessine les blocs de la piece qui sont dans la grille
         for (let i = 0; i < 20; i++) {
             for (let j = 0; j < 10; j++) {
-                if (grid[i][j] !== 0) {
-                    const id = grid[i][j];
+                if (grid[i][j] !== 0) { //Si la cellule n'est pas vide
+                    const id = grid[i][j]; //On recupere l'id de la piece
 
                     let colorValue;
                     let color;
                 
-                    tableauDePieces.forEach(piece => {
-                        if (piece.id === id) {
-                            piece.shape.forEach((row, y) => {
-                                row.forEach((value, x) => {
-                                    if (value !== 0) {
-                                        colorValue = value;
-                                        color = piece.getColor(colorValue);
+                    tableauDePieces.forEach(piece => { //On parcours le tableau de pieces
+                        if (piece.id === id) { //Si l'id de la piece est egal a l'id de la piece dans la grille
+                            piece.shape.forEach((row, y) => { //On parcours la forme de la piece
+                                row.forEach((value, x) => { //On parcours la forme de la piece
+                                    if (value !== 0) { //Si la cellule n'est pas vide
+                                        colorValue = value; //On recupere la valeur de la cellule
+                                        color = piece.getColor(colorValue); //On recupere la couleur de la cellule
                                     }
                                 })
                             })
                         }
                     })
 
-                    ctx.fillStyle = color;
-                    ctx.fillRect(j * columnWidth, i * rowHeight, columnWidth, rowHeight);
+                    ctx.fillStyle = color; //On definit la couleur de la cellule
+                    ctx.fillRect(j * columnWidth, i * rowHeight, columnWidth, rowHeight); //On dessine la cellule
                 }
             }
         }
@@ -228,16 +229,18 @@ class TetrisView {
     // Genere une grille vide
     getEmptyGrid() {
         //Design du canvas
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = 0.5;
-        ctx.background = 'white';
-
+        ctx.strokeStyle = 'red'; //Couleur des lignes
+        ctx.lineWidth = 0.5; //Epaisseur des lignes
+        ctx.background = 'white'; // Couleur de l'interieur de la grille
         ctx.fillStyle = ctx.background;
-        ctx.fillRect(0, 0, 350, 640);
-        for (let i = 0; i < 20; i++) {
-            grid[i] = new Array(10).fill(0);
+        ctx.fillRect(0, 0, 350, 640); // (x, y, largeur, hauteur)
+        
+        //Fonction qui crée une nouvelle ligne dans le tableau grid
+        for (let i = 0; i < 20; i++) {  
+            grid[i] = new Array(10).fill(0); //Elle crée un tableau de taille 10 et le rempli avec des 0.
         }
-
+        
+        //Initialisation de la taille des lignes et colonnes 
         let columnWidth = 350/10;
         let rowHeight = 640/20; 
 
@@ -268,7 +271,6 @@ class TetrisView {
     pause() {
         clearInterval(this.intervalId);
     }
-    
 
 }
 
@@ -291,42 +293,44 @@ class TetrisModel {
     }
 
     bindupdateGrid (callback) {
-        // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
-        this.updateGrid = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
+        this.updateGrid = callback;
     }
 
     bindremoveLine (callback) {
-        // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
-        this.removeLine = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
+        this.removeLine = callback;
     }
 
     bindgameOver (callback) {
-        // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
-        this.gameOver = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
+        this.gameOver = callback;
     }
     
 ///////////////////// FIN BIND MODELE  ////////////////////////////////
 
     //Fonction qui se lance au démarrage du jeu
     start() {
-        this.getEmptyGrid();
+        this.getEmptyGrid(); //On genere une grille vide
     }
 
-    //ecrit une fonction qui regarde si la piece peut etre inseree
+    //Vérifie si on peut insérer une nouvelle piece dans la grille
     canInsertPiece() {
-        let canInsert = true;
-        this.currentPiece.shape.forEach((row, y) => {
-            row.forEach((value, x) => {
-                if (value !== 0) {
-                    if (this.currentPiece.y + y < 0 || this.currentPiece.y + y > 19 || this.currentPiece.x + x < 0 || this.currentPiece.x + x > 9 || grid[this.currentPiece.y + y][this.currentPiece.x + x] !== 0) {
-                        canInsert = false;
+        let canInsert = true; //Insertion possible ou non
+        this.currentPiece.shape.forEach((row, y) => { //On parcours la forme de la piece
+            row.forEach((value, x) => { //On parcours la forme de la piece
+                if (value !== 0) { //Si la cellule n'est pas vide
+                    if (this.currentPiece.y + y < 0 || //Si la piece sort de la grille
+                        this.currentPiece.y + y > 19 || //Si la piece sort de la grille
+                        this.currentPiece.x + x < 0 || //Si la piece sort de la grille
+                        this.currentPiece.x + x > 9 || //Si la piece sort de la grille
+                        grid[this.currentPiece.y + y][this.currentPiece.x + x] !== 0) { //Si la piece est sur une autre piece
+                        canInsert = false; //On ne peut pas insérer la piece
                     }
                 }
             })
         })
-        return canInsert;
+        return canInsert; //On retourne si on peut insérer la piece ou non
     }
 
+    //Fonction qui permet d'afficher un popup de fin de partie
     gameOver() {
         alert("Game Over");
     }
@@ -334,104 +338,105 @@ class TetrisModel {
     //Fonction qui met une piece aleatoire dans le jeu
     getRandomPiece(grid) {
 
-        let date = new Date();
-        let seed = date.getTime();
+        let date = new Date(); //On instancie un objet de type date
+        let seed = date.getTime(); //On récupère le timestamp Unix qui nous servira pour les id des pieces
 
-        const pieces = ['I', 'J', 'L', 'O', 'S', 'T', 'Z'];
-        this.currentPiece = new Piece(seed, pieces[Math.floor(Math.random() * pieces.length)], grid);
-        this.currentPiece.insertPiece();
-        this.updateGrid();
-        this.drop();
-        tableauDePieces.push(this.currentPiece);
+        const pieces = ['I', 'J', 'L', 'O', 'S', 'T', 'Z']; //On définit les types de pieces disponibles
+        this.currentPiece = new Piece(seed, pieces[Math.floor(Math.random() * pieces.length)], grid); //On instancie une nouvelle piece avec un id aléatoire et un type aléatoire
+        this.currentPiece.insertPiece(); //On insère la piece dans la grille
+        this.updateGrid(); //On met à jour la grille
+        this.drop(); //On fait descendre la piece
+        tableauDePieces.push(this.currentPiece); //On ajoute la piece dans le tableau de pieces pour pouvoir gérer les pièces
     }
 
     // Fonction qui fait descendre les pieces
     moveDown() {
-        let impossible = false;
-        let points = [];
+        let impossible = false; //On initialise une variable qui nous permettra de savoir si la piece peut être déplacée ou non
+        let points = []; //On initialise un tableau qui contiendra les points de la piece
 
-        for (let row = 0; row < grid.length; row++) {
-            for (let col = 0; col < grid[0].length; col++) {
-                if (grid[row][col] === this.currentPiece.id) {
-                    // Ajoute le point à la liste des points
+        for (let row = 0; row < grid.length; row++) { //On parcours la grille
+            for (let col = 0; col < grid[0].length; col++) { //On parcours la grille
+                if (grid[row][col] === this.currentPiece.id) { //Si la cellule contient l'id de la piece
+                    // Ajoute le point à un tableau de points
                     points.push({
                         row: row,
                         col: col,
                     })
 
-                    // Supprime l'identifiant de la pièce de la grille
+                    //Supprime la piece de la grille en attendant les prochaines vérifications
                     grid[row][col] = 0;
                 }
             }
         }
 
         // On vérifie si la pièce peut être déplacée
-        points.forEach((point) => {
-            if(point.row === 19 || grid[point.row + 1][point.col] !== 0) {
-                impossible = true;
+        points.forEach((point) => { //On parcours les points de la piece
+            if(point.row === 19 || grid[point.row + 1][point.col] !== 0) { //Si la piece est sur le bas de la grille ou sur une autre piece
+                impossible = true; //On ne peut pas déplacer la piece
             }
         })
         
         if(!impossible) {
-            points.forEach((point) => {
-                // On déplace la pièce d'une ligne vers le bas
-                grid[point.row + 1][point.col] = this.currentPiece.id;
-                this.currentPiece.position = { row: points[0].row + 1, col: points[0].col }
-                this.updateGrid();
-                return 1;
+            points.forEach((point) => { //On parcours les points de la piece
+                
+                grid[point.row + 1][point.col] = this.currentPiece.id; //On déplace la piece d'une ligne vers le bas
+                this.currentPiece.position = { row: points[0].row + 1, col: points[0].col } //On met à jour la position de la piece
+                this.updateGrid(); //On met à jour la grille
+                return 1; //On retourne 1 pour dire que la piece a été déplacée
             })
         } else {
-            points.forEach(point => {
-                grid[point.row][point.col] = this.currentPiece.id;
+            points.forEach(point => { //On parcours les points de la piece
+                grid[point.row][point.col] = this.currentPiece.id; //On remet la piece à sa position d'origine
             })
-            return 0;
+            return 0; //On retourne 0 pour dire que la piece n'a pas été déplacée
         }
     }
 
     //Fonction qui deplace la piece a droite
     moveRight() {
-        let impossible = false;
-        let points = [];
+        let impossible = false; //On initialise une variable qui nous permettra de savoir si la piece peut être déplacée ou non
+        let points = []; //On initialise un tableau qui contiendra les points de la piece
 
-        for (let row = 0; row < grid.length; row++) {
-            for (let col = 0; col < grid[0].length; col++) {
-                if (grid[row][col] === this.currentPiece.id) {
+        for (let row = 0; row < grid.length; row++) { //On parcours la grille
+            for (let col = 0; col < grid[0].length; col++) { //On parcours la grille
+                if (grid[row][col] === this.currentPiece.id) { //Si la cellule contient l'id de la piece
                     // Ajoute le point à la liste des points
                     points.push({
                         row: row,
                         col: col,
                     })
 
-                    // Supprime l'identifiant de la pièce de la grille
+                    // Supprime la pièce de la grille en attendant les prochaines vérifications
                     grid[row][col] = 0;
                 }
             }
         }
 
         // On vérifie si la pièce peut être déplacée
-        points.forEach((point) => {
-            if(point.row === 19 || grid[point.row][point.col + 1] !== 0) {
-                impossible = true;
+        points.forEach((point) => { //On parcours les points de la piece
+            if(point.row === 19 || grid[point.row][point.col + 1] !== 0) { //Si la piece est sur le bas de la grille ou sur une autre piece
+                impossible = true; //On ne peut pas déplacer la piece
             }
         })
 
-        if(!impossible) {
-            points.forEach((point) => {
-                // On déplace la pièce d'une colonne vers la droite
-                grid[point.row][point.col + 1] = this.currentPiece.id;
-                this.currentPiece.position = { row: points[0].row, col: points[0].col + 1 }
-                this.updateGrid();
-                return 1;
+        if(!impossible) { //Si on peut déplacer la piece
+            points.forEach((point) => { //On parcours les points de la piece
+
+                grid[point.row][point.col + 1] = this.currentPiece.id; //On déplace la piece d'une colonne vers la droite
+                this.currentPiece.position = { row: points[0].row, col: points[0].col + 1 } //On met à jour la position de la piece
+                this.updateGrid(); //On met à jour la grille
+                return 1; //On retourne 1 pour dire que la piece a été déplacée
             })
         } else {
-            points.forEach(point => {
-                grid[point.row][point.col] = this.currentPiece.id;
+            points.forEach(point => { //On parcours les points de la piece
+                grid[point.row][point.col] = this.currentPiece.id; //On remet la piece à sa position d'origine
             })
-            return 0;
+            return 0; //On retourne 0 pour dire que la piece n'a pas été déplacée
         }
     }
 
-    //Fonction qui deplace la piece a gauche
+    /* MEME CHOSE QUE POUR MOVE DOWN et MOVE RIGHT*/
+
     moveLeft() {
         let impossible = false;
         let points = [];
@@ -474,14 +479,13 @@ class TetrisModel {
         }
     }
 
-    //Fonction qui permet de faire rotate la piece
+    //Fonction qui permet de faire tourner la piece
     rotate() {
-        let impossible = false;
-        let points = [];
+        let points = []; //On initialise un tableau qui contiendra les points de la piece
 
-        for (let row = 0; row < grid.length; row++) {
-            for (let col = 0; col < grid[0].length; col++) {
-                if (grid[row][col] === this.currentPiece.id) {
+        for (let row = 0; row < grid.length; row++) { //On parcours la grille
+            for (let col = 0; col < grid[0].length; col++) { //On parcours la grille
+                if (grid[row][col] === this.currentPiece.id) { //Si la cellule contient l'id de la piece
                     // Ajoute le point à la liste des points
                     points.push({
                         row: row,
@@ -494,44 +498,43 @@ class TetrisModel {
             }
         }
 
-        let newShape = [];
-        for (let i = 0; i < this.currentPiece.shape[0].length; i++) {
-            newShape[i] = [];
-            for (let j = 0; j < this.currentPiece.shape.length; j++) {
-                newShape[i][j] = this.currentPiece.shape[this.currentPiece.shape.length - j - 1][i];
+        let newShape = []; //On initialise un tableau qui contiendra la nouvelle forme de la piece
+        for (let i = 0; i < this.currentPiece.shape[0].length; i++) { //On parcours la forme de la piece
+            newShape[i] = []; //On crée un tableau pour chaque ligne de la forme de la piece
+            for (let j = 0; j < this.currentPiece.shape.length; j++) { //On parcours la forme de la piece
+                newShape[i][j] = this.currentPiece.shape[this.currentPiece.shape.length - j - 1][i]; //On crée la nouvelle forme de la piece en inversant les lignes et les colonnes
             }
         }
 
-        this.currentPiece.shape = newShape;
+        this.currentPiece.shape = newShape; //On met à jour la forme de la piece
 
-        // Via sa shape, on replace la pièce dans la grille
-        for (let i = 0; i < this.currentPiece.shape.length; i++) {
-            for (let j = 0; j < this.currentPiece.shape[0].length; j++) {
-                if (this.currentPiece.shape[i][j] !== 0) {
-                    grid[this.currentPiece.position.row + i][this.currentPiece.position.col + j] = this.currentPiece.id;
+        for (let i = 0; i < this.currentPiece.shape.length; i++) { //On parcours la forme de la piece
+            for (let j = 0; j < this.currentPiece.shape[0].length; j++) { //On parcours la forme de la piece
+                if (this.currentPiece.shape[i][j] !== 0) { //Si la cellule de la forme de la piece n'est pas vide
+                    grid[this.currentPiece.position.row + i][this.currentPiece.position.col + j] = this.currentPiece.id; //On met à jour la grille avec la nouvelle forme de la piece
                 }
             }
         }
 
-        this.updateGrid();
+        this.updateGrid(); //On met à jour la grille
     }
 
     
     drop() {    
-        clearInterval(this.intervalId);
-        this.intervalId = setInterval(() => {
-            if(this.moveDown() === 0){
-                this.getRandomPiece(grid);
-                this.removeLine();
-                this.updateGrid();
+        clearInterval(this.intervalId); //On arrête le timer
+        this.intervalId = setInterval(() => { //On relance le timer
+            if(this.moveDown() === 0){ //Si la piece ne peut pas être déplacée vers le bas
+                this.getRandomPiece(grid); //On récupère une nouvelle pièce
+                this.removeLine(); //On supprime les lignes
+                this.updateGrid(); //On met à jour la grille
             }   
-        }, 1000);
+        }, 1000); //On met à jour le timer toutes les secondes
     }   
 }
 /*******************  FIN CLASSE MODELE  *********************/
 
 
-export let tableauDePieces = [];
+export let tableauDePieces = []; //On initialise un tableau qui contiendra les pièces
 
 
 /*******************   CLASSE PIECE  *********************/
@@ -541,17 +544,17 @@ class Piece {
         this.id = id;
         this.type = type;
         grid = grid_piece;
-        this.position = { x: 3, y: 0 };
-        this.rotation = 0;
-        this.shape = this.getShape();
-        this.cols = this.shape[0].length;
-        this.rows = this.shape.length;
-        this.blocks = [];
-        for (let i = 0; i < this.rows; i++) {
-            for (let j = 0; j < this.cols; j++) {
+        this.position = { x: 3, y: 0 }; //On initialise la position de la piece
+        this.rotation = 0; //On initialise la rotation de la piece
+        this.shape = this.getShape(); //On récupère la forme de la piece
+        this.cols = this.shape[0].length; //On récupère le nombre de colonnes de la forme de la piece
+        this.rows = this.shape.length; //On récupère le nombre de lignes de la forme de la piece
+        this.blocks = []; //On initialise un tableau qui contiendra les blocs de la piece
+        for (let i = 0; i < this.rows; i++) { //On parcours la forme de la piece
+            for (let j = 0; j < this.cols; j++) { //On parcours la forme de la piece
                 // Si la case est pleine
                 if (this.shape[i][j] !== 0) {
-                    // On ajoute a un tableau block
+                    // Ajoute le bloc à la liste des blocs
                     this.blocks.push({ col: this.position.x + j, row: this.position.y + i, color: this.shape[i][j] });
                 }
             }
@@ -593,36 +596,32 @@ class Piece {
     }
 
     insertPiece() {
-        let gameOver = false;
-        this.blocks.forEach(block => {
-            if (grid[block.row][block.col] !== 0) {
-                alert('Game Over');
-                gameOver = true;
-                return;
+        let gameOver = false; //On initialise gameOver à false
+        this.blocks.forEach(block => { //On parcours les blocs de la piece
+            if (grid[block.row][block.col] !== 0) { //Si la case de la grille n'est pas vide
+                alert('Game Over'); //On affiche le popup Game Over
+                gameOver = true; //On met gameOver à true
+                return; //On sort de la fonction
             }
         })
-        if (!gameOver) {
-            this.blocks.forEach(block => {
-                grid[block.row][block.col] = this.id;
+        if (!gameOver) { //Si gameOver est à false
+            this.blocks.forEach(block => { //On parcours les blocs de la piece
+                grid[block.row][block.col] = this.id; //On met à jour la grille avec la nouvelle forme de la piece
             })
         }
     }
 
-    /*
-    insertPiece() {
-        this.blocks.forEach(block => {
-            grid[block.row][block.col] = this.id;
-        })
-    }
-    */
+    /* placePiece parcourt la forme de la pièce et vérifie si chaque case est vide. 
+    Si elle est vide, il passe à la case suivante. 
+    Sinon, il met à jour la grille avec la nouvelle forme de la pièce en utilisant les coordonnées x et y de sa position actuelle.*/
 
     placePiece() {
-        for (let y = 0; y < this.shape.length; y++) {
-            for (let x = 0; x < this.shape[y].length; x++) {
-                if (this.shape[y][x] === 0) {
-                    continue;
+        for (let y = 0; y < this.shape.length; y++) { //On parcours la forme de la piece
+            for (let x = 0; x < this.shape[y].length; x++) { //On parcours la forme de la piece
+                if (this.shape[y][x] === 0) { //Si la case de la forme de la piece est vide
+                    continue; //On passe à la case suivante
                 }
-                this.grid[this.position.y + y][this.position.x + x] = this.type;
+                this.grid[this.position.y + y][this.position.x + x] = this.type; //On met à jour la grille avec la nouvelle forme de la piece
             }
         }
     }
