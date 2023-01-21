@@ -84,17 +84,17 @@ class Controller {
     }
 
 }
-
+/***************** FIN CLASSE CONTROLLER  ************************/
 export let ctx;
 export let grid = [];
 
+/***************** CLASSE VIEW  ************************/
 class TetrisView {
 
     constructor() {
-
+        this.score = 0; 
         this.startButton = document.getElementById("start");
-        this.pauseButton = document.getElementById("stop");
-
+        this.pauseButton = document.getElementById("pause");
         this.canvas = document.getElementById('tetris-canvas');
         ctx = this.canvas.getContext('2d');
         this.getEmptyGrid();
@@ -105,6 +105,7 @@ class TetrisView {
         this.pauseButton.addEventListener('click', () => {
             this.pause();
         });
+        
 
         //Detecte lorsque on appuit sur une touche du clavier
         document.addEventListener("keydown", function(event) {
@@ -150,17 +151,12 @@ class TetrisView {
 
 ///////////////////// FIN BIND VIEW  ////////////////////////////////
 
-    //Fonction qui arrete le jeu quand une piece touche le haut de la grille
-    gameOver() {
-        if (grid[0].some(function(cell) {
-            return cell !== 0;
-        })) {
-            alert("Game Over");
-            this.pause();
-        }
+    increaseScore() {
+        this.score = this.score + 100;
+        document.getElementById("score").innerHTML = this.score;
     }
 
-    //Fonction qui permet de supprimer la ligne lorsque elle est pleine
+    //Fonction qui permet de supprimer la ligne lorsque elle est pleine et rajoute une ligne de zero en haut de la grille
     removeLine() {
         for (let row = 0; row < grid.length; row++) {
             let isRowFull = grid[row].every(function(cell) {
@@ -169,6 +165,7 @@ class TetrisView {
             if (isRowFull) {
                 grid.splice(row, 1);
                 grid.unshift(Array(10).fill(0));
+                this.increaseScore();
             }
         }
     }
@@ -183,19 +180,20 @@ class TetrisView {
         let columnWidth = 350/10;
         let rowHeight = 640/20;
 
+        // Dessine les lignes verticales de la grille
         for (let x = 0; x < 11; x++) {
             ctx.beginPath();
-            ctx.moveTo(x * columnWidth, 0);
-            ctx.lineTo(x * columnWidth, 20 * rowHeight);
-            ctx.stroke();
+            ctx.moveTo(x * columnWidth, 0); //deplace le curseur de dessin de haut
+            ctx.lineTo(x * columnWidth, 20 * rowHeight); // en bas
+            ctx.stroke(); //dessine reellement les colonnes
         }
 
         // Dessine les lignes horizontales de la grille
         for (let y = 0; y < 21; y++) {
             ctx.beginPath();
-            ctx.moveTo(0, y * rowHeight);
-            ctx.lineTo(10 * columnWidth, y * rowHeight);
-            ctx.stroke();
+            ctx.moveTo(0, y * rowHeight); //deplace le curseur de dessin de gauche
+            ctx.lineTo(10 * columnWidth, y * rowHeight); //a droite
+            ctx.stroke(); //dessine reellement les lignes
         }
         
         // On dessine les blocs
@@ -269,8 +267,8 @@ class TetrisView {
     //Pause the game
     pause() {
         clearInterval(this.intervalId);
-        this.intervalId = undefined;
     }
+    
 
 }
 
@@ -284,7 +282,6 @@ class TetrisModel {
         this.lines = 0;
         this.gameOver = false;
         this.currentPiece;
-        this.nextPiece;
     }
     
 ///////////////////// BIND MODELE  ////////////////////////////////
@@ -310,13 +307,31 @@ class TetrisModel {
     
 ///////////////////// FIN BIND MODELE  ////////////////////////////////
 
-    //Focntion qui se lance au démarrage du jeu
+    //Fonction qui se lance au démarrage du jeu
     start() {
-        this.getEmptyGrid();
         this.getEmptyGrid();
     }
 
-    //ecrit la fonction getrandompiece pour qu'elle ajoute une couleuer à la piece
+    //ecrit une fonction qui regarde si la piece peut etre inseree
+    canInsertPiece() {
+        let canInsert = true;
+        this.currentPiece.shape.forEach((row, y) => {
+            row.forEach((value, x) => {
+                if (value !== 0) {
+                    if (this.currentPiece.y + y < 0 || this.currentPiece.y + y > 19 || this.currentPiece.x + x < 0 || this.currentPiece.x + x > 9 || grid[this.currentPiece.y + y][this.currentPiece.x + x] !== 0) {
+                        canInsert = false;
+                    }
+                }
+            })
+        })
+        return canInsert;
+    }
+
+    gameOver() {
+        alert("Game Over");
+    }
+
+    //Fonction qui met une piece aleatoire dans le jeu
     getRandomPiece(grid) {
 
         let date = new Date();
@@ -324,13 +339,13 @@ class TetrisModel {
 
         const pieces = ['I', 'J', 'L', 'O', 'S', 'T', 'Z'];
         this.currentPiece = new Piece(seed, pieces[Math.floor(Math.random() * pieces.length)], grid);
-        this.nextPiece = new Piece(seed, pieces[Math.floor(Math.random() * pieces.length)], grid);
         this.currentPiece.insertPiece();
         this.updateGrid();
         this.drop();
         tableauDePieces.push(this.currentPiece);
     }
 
+    // Fonction qui fait descendre les pieces
     moveDown() {
         let impossible = false;
         let points = [];
@@ -464,8 +479,6 @@ class TetrisModel {
         let impossible = false;
         let points = [];
 
-        console.log(this.currentPiece);
-
         for (let row = 0; row < grid.length; row++) {
             for (let col = 0; col < grid[0].length; col++) {
                 if (grid[row][col] === this.currentPiece.id) {
@@ -489,8 +502,6 @@ class TetrisModel {
             }
         }
 
-        console.log(newShape);
-
         this.currentPiece.shape = newShape;
 
         // Via sa shape, on replace la pièce dans la grille
@@ -512,7 +523,6 @@ class TetrisModel {
             if(this.moveDown() === 0){
                 this.getRandomPiece(grid);
                 this.removeLine();
-                this.gameOver();
                 this.updateGrid();
             }   
         }, 1000);
@@ -562,7 +572,7 @@ class Piece {
         return shapes[this.type];
     }
     
-    //Fonction qui permet de mettre de la couleur sur les piece
+    //Fonction qui permet de mettre de la couleur sur les pieces
     getColor(id) {
         switch (id) {
             case 1:
@@ -583,20 +593,28 @@ class Piece {
     }
 
     insertPiece() {
+        let gameOver = false;
+        this.blocks.forEach(block => {
+            if (grid[block.row][block.col] !== 0) {
+                alert('Game Over');
+                gameOver = true;
+                return;
+            }
+        })
+        if (!gameOver) {
+            this.blocks.forEach(block => {
+                grid[block.row][block.col] = this.id;
+            })
+        }
+    }
+
+    /*
+    insertPiece() {
         this.blocks.forEach(block => {
             grid[block.row][block.col] = this.id;
         })
     }
-
-    // Fait tourner la pièce
-    rotate(clockwise = true) {
-        if (clockwise) {
-            this.rotation = (this.rotation + 1) % 4;
-        } else {
-            this.rotation = (this.rotation + 3) % 4;
-        }
-        this.shape = this.getShape();
-    }
+    */
 
     placePiece() {
         for (let y = 0; y < this.shape.length; y++) {
