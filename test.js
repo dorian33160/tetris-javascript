@@ -22,6 +22,24 @@ class Controller {
         this.bindupdateGrid = this.bindupdateGrid.bind(this);
         this.modele.bindupdateGrid(this.bindupdateGrid);
 
+<<<<<<< Updated upstream
+=======
+        this.bindmoveRight = this.bindmoveRight.bind(this);
+        this.view.bindmoveRight(this.bindmoveRight);
+
+        this.bindmoveLeft = this.bindmoveLeft.bind(this);
+        this.view.bindmoveLeft(this.bindmoveLeft);
+
+        this.bindrotate = this.bindrotate.bind(this);
+        this.view.bindrotate(this.bindrotate);
+
+        this.bindmoveDown = this.bindmoveDown.bind(this);
+        this.view.bindmoveDown(this.bindmoveDown);
+
+        this.bindremoveLine = this.bindremoveLine.bind(this);
+        this.modele.bindremoveLine(this.bindremoveLine);
+
+>>>>>>> Stashed changes
     }
 
     bindgetEmptyGrid(grid) {
@@ -40,11 +58,35 @@ class Controller {
         this.view.updateGrid();
     }
 
+<<<<<<< Updated upstream
     
+=======
+    bindmoveRight() {
+        this.modele.moveRight();
+    }
+
+    bindmoveLeft() {
+        this.modele.moveLeft();
+    }
+
+    bindrotate() {
+        this.modele.rotate();
+    }
+
+    bindmoveDown() {
+        this.modele.moveDown();
+    }
+
+    bindremoveLine() {
+        this.view.removeLine();
+    }
+
+>>>>>>> Stashed changes
 }
 
 export let ctx;
 export let grid = [];
+export let score = 0; 
 
 class TetrisView {
 
@@ -52,6 +94,7 @@ class TetrisView {
 
         this.startButton = document.getElementById("start");
         this.pauseButton = document.getElementById("stop");
+        this.score1 = document.getElementById("score");
 
         this.canvas = document.getElementById('tetris-canvas');
         ctx = this.canvas.getContext('2d');
@@ -63,6 +106,21 @@ class TetrisView {
         this.pauseButton.addEventListener('click', () => {
             this.pause();
         });
+<<<<<<< Updated upstream
+=======
+        //Detecte lorsque on appuit sur une touche du clavier
+        document.addEventListener("keydown", function(event) {
+            if (event.keyCode == 37) { //fleche gauche
+                this.moveLeft();
+            } else if (event.keyCode == 39) { //fleche de droite
+                this.moveRight();
+            } else if (event.keyCode == 38) { //fleche du haut pour rotate la piece
+                this.rotate();
+            } else if (event.keyCode == 40) { //fleche du bas pour faire acceler la piece
+                this.moveDown();
+            }
+        }.bind(this));
+>>>>>>> Stashed changes
 
         this.game = new TetrisModel(this);
     }
@@ -77,6 +135,41 @@ class TetrisView {
     this.drop = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
     }
 
+<<<<<<< Updated upstream
+=======
+    bindmoveRight (callback) {
+        this.moveRight = callback; 
+    }
+
+    bindmoveLeft (callback) {
+        this.moveLeft = callback; 
+    }
+
+    bindrotate (callback) {
+        this.rotate = callback; 
+    }
+
+    bindmoveDown (callback) {
+        this.moveDown = callback; 
+    }
+
+///////////////////// FIN BIND VIEW  ////////////////////////////////
+
+    //Fonction qui permet de supprimer la ligne lorsque elle est pleine
+    removeLine() {
+        for (let row = 0; row < grid.length; row++) {  //parcours chaque ligne du tableau
+            let isRowFull = grid[row].every(function(cell) {//verifie si toutes les cellules de la ligne sont remplis
+                return cell !== 0; 
+            });
+            if (isRowFull) {
+                grid.splice(row, 1); // splice : methode permettant de supprimer la ligne 
+                grid.unshift(Array(10).fill(0)); //et une nouvelle ligne remplis de 0 est ajoutee en haut (unshift) ce qui permet de faire tomber toute les lignes du dessus.
+            }
+        }
+    }
+
+    //Permet de mettre a jour la grille
+>>>>>>> Stashed changes
     updateGrid() {
         // On efface la grille
         ctx.fillStyle = ctx.background;
@@ -199,6 +292,12 @@ class TetrisModel {
         this.level = 1;
         this.lines = 0;
         this.gameOver = false;
+<<<<<<< Updated upstream
+=======
+        this.currentPiece;
+        this.nextPiece;
+        this.multiplier=1;
+>>>>>>> Stashed changes
     }
     
     // Binding.
@@ -212,6 +311,16 @@ class TetrisModel {
         this.updateGrid = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
     }
 
+<<<<<<< Updated upstream
+=======
+    bindremoveLine (callback) {
+        // Définition d'une nouvelle propriété pouvant être utilisée à partir d'une instance de Model.
+        this.removeLine = callback; // On veut pouvoir actualiser la View (depuis le Controller) quand nous récupérons les données.
+    }
+    
+///////////////////// FIN BIND MODELE  ////////////////////////////////
+
+>>>>>>> Stashed changes
     //Focntion qui se lance au démarrage du jeu
     start() {
         this.getEmptyGrid();
@@ -225,6 +334,17 @@ class TetrisModel {
         this.updateGrid();
     }
 
+    gameOver(){
+        alert("Game Over !");
+    }
+
+    score(nb_ligne){
+        for (i in nb_ligne){
+            this.score += this.multiplier * 100;
+            this.multiplier++;
+        }
+    }
+    
     moveDown() {
         for (let i = 19; i >= 0; i--) {
             for (let j = 0; j < 10; j++) {
@@ -245,7 +365,15 @@ class TetrisModel {
         const pieces = ['I', 'J', 'L', 'O', 'S', 'T', 'Z'];
         const new_piece = new Piece(pieces[Math.floor(Math.random() * pieces.length)], grid);
         this.intervalId = setInterval(() => {
+<<<<<<< Updated upstream
             this.moveDown();
+=======
+            if(this.moveDown() === 0){
+                this.getRandomPiece(grid);
+                this.removeLine();
+                this.updateGrid();
+            }   
+>>>>>>> Stashed changes
         }, 1000);
     }
 
