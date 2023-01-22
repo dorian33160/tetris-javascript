@@ -161,7 +161,7 @@ class TetrisView {
         for (let row = 0; row < grid.length; row++) {
             //Parcour chaque cellule de la ligne et verifie si elle est pleine
             let isRowFull = grid[row].every(function(cell) {
-                return cell !== 0;
+                return cell !== 0; //Renvoie true si la ligne est pleine
             });
             if (isRowFull) { //Si une ligne est pleine alors :
                 grid.splice(row, 1); // On la supprime
@@ -508,6 +508,8 @@ class TetrisModel {
 
         this.currentPiece.shape = newShape; //On met à jour la forme de la piece
 
+        //permet de remplacer les valeurs de la forme de la piève par son ID
+        
         for (let i = 0; i < this.currentPiece.shape.length; i++) { //On parcours la forme de la piece
             for (let j = 0; j < this.currentPiece.shape[0].length; j++) { //On parcours la forme de la piece
                 if (this.currentPiece.shape[i][j] !== 0) { //Si la cellule de la forme de la piece n'est pas vide
