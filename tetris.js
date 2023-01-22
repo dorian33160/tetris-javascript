@@ -561,7 +561,7 @@ class Piece {
         }
     }
 
-    // Retourne la forme de la pièce en fonction de son type et de sa rotation
+    // Retourne la forme de la pièce en fonction de son type
     getShape() {
         const shapes = {
             I: [[0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0]],
