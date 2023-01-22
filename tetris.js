@@ -151,7 +151,7 @@ class TetrisView {
 
     //fonction qui permet d'augmenter le score
     increaseScore() {
-        this.score = this.score + 100; // On ajoute 100 a chaque fois qu'une ligne est remplis et cassee
+        this.score = this.score + 100; // On ajoute 100 a chaque fois qu'une ligne est remplis et casses
         document.getElementById("score").innerHTML = this.score; //Va cehrcher l'id score dans l'HTML pour afficher le score
     }
 
@@ -611,20 +611,6 @@ class Piece {
         }
     }
 
-    /* placePiece parcourt la forme de la pièce et vérifie si chaque case est vide. 
-    Si elle est vide, il passe à la case suivante. 
-    Sinon, il met à jour la grille avec la nouvelle forme de la pièce en utilisant les coordonnées x et y de sa position actuelle.*/
-
-    placePiece() {
-        for (let y = 0; y < this.shape.length; y++) { //On parcours la forme de la piece
-            for (let x = 0; x < this.shape[y].length; x++) { //On parcours la forme de la piece
-                if (this.shape[y][x] === 0) { //Si la case de la forme de la piece est vide
-                    continue; //On passe à la case suivante
-                }
-                this.grid[this.position.y + y][this.position.x + x] = this.type; //On met à jour la grille avec la nouvelle forme de la piece
-            }
-        }
-    }
     /***************** FIN CLASSE PIECE  ************************/
 }
 
